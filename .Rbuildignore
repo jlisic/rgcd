@@ -1,0 +1,16 @@
+.git
+.swo
+.swp
+src/.so
+src/.o
+.gitignore
+README.md
+^.*\.Rproj$
+^\.Rproj\.user$
+test
+todo
+.travis.yml
+mac_*
+config.status
+autom4te.*
+config.log

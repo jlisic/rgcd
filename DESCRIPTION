@@ -1,0 +1,13 @@
+Package:  rgcd 
+Type: Package
+Title: An example of using grand central dispatch 
+Version: 0.01
+Authors@R: c(
+    person("Jonathan", "Lisic", , "jlisic@gmail.com", c("aut", "cre"))
+    )
+BugReports: https://github.com/jlisic/rgcd/issues
+Maintainer: Jonathan Lisic <jlisic@gmail.com>
+Description: A simple example of vector multiplication using grand central dispatch. 
+Depends: R (>= 3.3.0)
+License: BSD-2 
+RoxygenNote: 6.0.1
