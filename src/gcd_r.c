@@ -13,7 +13,7 @@ void R_parallel_vector_multiply_gcd( double * x, double * y, int * n ) {
 
 #ifdef _LIBDISPATCH
   // concurrent queue 
-  dispatch_queue_t my_queue = dispatch_queue_create("r.dispatch",DISPATCH_QUEUE_CONCURRENT);
+   dispatch_queue_t my_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
   // for like loop
   dispatch_apply (*n, my_queue, ^(size_t idx){

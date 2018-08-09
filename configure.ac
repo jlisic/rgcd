@@ -27,11 +27,51 @@ AC_MSG_NOTICE([${PACKAGE_NAME}: ${PACKAGE_VERSION}])
 AC_MSG_CHECKING(can I compile GCD with Apple System frameworks) 
 
 # can compile?
-[cat > mac_gcd.c <<_EOCONF
+[cat > test_gcd.c <<_EOCONF
  #include <stdio.h>
+ #include <stdlib.h>
  #include <dispatch/dispatch.h>
  int main() {
-   dispatch_queue_t my_queue = dispatch_queue_create("r.dispatch",DISPATCH_QUEUE_CONCURRENT);
+   dispatch_queue_t my_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+   dispatch_apply (100, my_queue, ^(size_t idx){
+     int j;
+     j = idx*idx; 
+   });
+
+   exit(0);
+ }
+_EOCONF]
+
+
+if test `${CC} ${CFLAGS} ${PKG_CFLAGS} ${CPPFLAGS} ${PKG_CPPFLAGS} -o test_gcd test_gcd.c -framework system ${LDFLAGS} ${PKG_LIBS} 2> /dev/null; echo $?` = 0; then
+  AC_MSG_RESULT(yes)
+
+  ## can run?
+  AC_MSG_CHECKING(can I run GCD with Apple System frameworks)
+
+  if test `./test_gcd; echo $?` = 0; then
+    AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -D_LIBDISPATCH"])
+    AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -framework system"])
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi
+
+else
+  AC_MSG_RESULT(no)
+fi
+
+
+## Grand Central Dispatch on FreeBSD
+AC_MSG_CHECKING(can I compile GCD with libdispatch) 
+
+# can compile?
+[cat > test_gcd.c <<_EOCONF
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <dispatch/dispatch.h>
+ int main() {
+   dispatch_queue_t my_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
    dispatch_apply (100, my_queue, ^(size_t idx){
      int j;
@@ -43,39 +83,33 @@ AC_MSG_CHECKING(can I compile GCD with Apple System frameworks)
 _EOCONF]
 
 
-if test `${CC} ${CFLAGS} ${PKG_CPPFLAGS} -o mac_gcd mac_gcd.c -framework system ${PKG_LIBS} 2> /dev/null; echo $?` = 0; then
+
+if test `${CC} ${CFLAGS} ${PKG_CFLAGS} ${CPPFLAGS} ${PKG_CPPFLAGS} -o test_gcd test_gcd.c -fblocks -lBlocksRuntime -ldispatch ${LDFLAGS} ${PKG_LIBS} 2> /dev/null; echo $?` = 0; then
   AC_MSG_RESULT(yes)
 
   ## can run?
-  AC_MSG_CHECKING(can I run GCD with Apple System frameworks)
+  AC_MSG_CHECKING(can I run GCD with libdispatch)
 
-  if test `./mac_gcd; echo $?` = 0; then
-    AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -D_LIBDISPATCH"])
-    AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -framework system"])
+  if test `./test_gcd; echo $?` = 0; then
+    AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -fblocks -D_LIBDISPATCH"])
+    AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -lBlocksRuntime -ldispatch"])
     AC_MSG_RESULT(yes)
   else
     AC_MSG_RESULT(no)
-    AC_MSG_NOTICE([Unable to run with Apple System frameworks])
   fi
 
 else
   AC_MSG_RESULT(no)
-  AC_MSG_NOTICE([Unable to compile with Apple System frameworks])
 fi
-
-
-## Grand Central Dispatch on FreeBSD
-
-
-## Grand Central Dispatch on Linux
 
 
 ## OpenMP 
 AC_MSG_CHECKING(can I compile with OpenMP) 
 
 # can compile?
-[cat > mac_omp.c <<_EOCONF
+[cat > test_omp.c <<_EOCONF
  #include <stdio.h>
+ #include <stdlib.h>
  #include <omp.h>
  int main() {
    omp_set_num_threads(2);
@@ -88,24 +122,22 @@ AC_MSG_CHECKING(can I compile with OpenMP)
  }
 _EOCONF]
 
-if test `${CC} ${CFLAGS} ${PKG_CPPFLAGS} -o mac_omp mac_omp.c -fopenmp ${PKG_LIBS} 2> /dev/null; echo $?` = 0; then
+if test `${CC} ${CFLAGS} ${PKG_CFLAGS} ${CPPFLAGS} ${PKG_CPPFLAGS} -o test_omp test_omp.c -fopenmp ${LDFLAGS} ${PKG_LIBS} 2> /dev/null; echo $?` = 0; then
   AC_MSG_RESULT(yes)
 
   ## Can run
   AC_MSG_CHECKING(can I run with OpenMP)
 
-  if test `./mac_omp; echo $?` = 0; then
+  if test `./test_omp; echo $?` = 0; then
     AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -fopenmp"])
     AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -fopenmp"])
     AC_MSG_RESULT(yes)
   else
     AC_MSG_RESULT(no)
-    AC_MSG_NOTICE([Unable to run with OpenMP])
   fi
   
 else
   AC_MSG_RESULT(no)
-  AC_MSG_NOTICE([Unable to compile with OpenMP])
 fi
 
 
@@ -115,4 +147,4 @@ AC_MSG_NOTICE([Package LIBS =   ${PKG_LIBS}])
 AC_CONFIG_FILES(src/Makevars)
 AC_OUTPUT
 
-rm -rf mac_* 
+rm -rf test_* 
