@@ -32,7 +32,7 @@ AC_MSG_CHECKING(can I compile GCD with Apple System frameworks)
  #include <stdlib.h>
  #include <dispatch/dispatch.h>
  int main() {
-   dispatch_queue_t my_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+   dispatch_queue_t my_queue = dispatch_get_global_queue(0, 0);
    dispatch_apply (100, my_queue, ^(size_t idx){
      int j;
      j = idx*idx; 
@@ -71,7 +71,7 @@ AC_MSG_CHECKING(can I compile GCD with libdispatch)
  #include <stdlib.h>
  #include <dispatch/dispatch.h>
  int main() {
-   dispatch_queue_t my_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+   dispatch_queue_t my_queue = dispatch_get_global_queue(0, 0);
 
    dispatch_apply (100, my_queue, ^(size_t idx){
      int j;
