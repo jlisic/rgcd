@@ -1,0 +1,11 @@
+*.o
+*.so
+*.dll
+*.swo
+*.swp
+vgcore.*
+.Rproj.user
+autom4te.cache
+mac_*
+config.status
+config.log

@@ -1718,10 +1718,7 @@ $as_echo "yes" >&6; }
 $as_echo_n "checking can I run GCD with Apple System frameworks... " >&6; }
 
   if test `./test_gcd; echo $?` = 0; then
-    PKG_CFLAGS="${PKG_CFLAGS} -D_LIBDISPATCH"
-
-    PKG_LIBS="${PKG_LIBS} -framework system"
-
+    : ${FRAMEWORK="GCD_OSX"}
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
   else
@@ -1735,7 +1732,7 @@ $as_echo "no" >&6; }
 fi
 
 
-## Grand Central Dispatch on FreeBSD
+## Grand Central Dispatch on FreeBSD/Linux
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking can I compile GCD with libdispatch" >&5
 $as_echo_n "checking can I compile GCD with libdispatch... " >&6; }
 
@@ -1767,10 +1764,7 @@ $as_echo "yes" >&6; }
 $as_echo_n "checking can I run GCD with libdispatch... " >&6; }
 
   if test `./test_gcd; echo $?` = 0; then
-    PKG_CFLAGS="${PKG_CFLAGS} -fblocks -D_LIBDISPATCH"
-
-    PKG_LIBS="${PKG_LIBS} -lBlocksRuntime -ldispatch"
-
+    : ${FRAMEWORK="LIBDISPATCH"}
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
   else
@@ -1813,10 +1807,7 @@ $as_echo "yes" >&6; }
 $as_echo_n "checking can I run with OpenMP... " >&6; }
 
   if test `./test_omp; echo $?` = 0; then
-    PKG_CFLAGS="${PKG_CFLAGS} -fopenmp"
-
-    PKG_LIBS="${PKG_LIBS} -fopenmp"
-
+    : ${FRAMEWORK="OPENMP"}
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
   else
@@ -1829,6 +1820,31 @@ else
 $as_echo "no" >&6; }
 fi
 
+## Assign compile flags
+
+# lowest priority OPENMP
+if test `echo ${FRAMEWORK}` = "OPENMP"; then
+    PKG_CFLAGS="${PKG_CFLAGS} -fopenmp"
+
+    PKG_LIBS="${PKG_LIBS} -fopenmp"
+
+fi
+
+# second lowest priority GCD FreeBSD / Linux
+if test `echo ${FRAMEWORK}` = "LIBDISPATCH"; then
+    PKG_CFLAGS="${PKG_CFLAGS} -fblocks -D_LIBDISPATCH"
+
+    PKG_LIBS="${PKG_LIBS} -lBlocksRuntime -ldispatch"
+
+fi
+
+# highest priority GCD MacOS
+if test `echo ${FRAMEWORK}` = "GCD_OSX"; then
+    PKG_CFLAGS="${PKG_CFLAGS} -D_LIBDISPATCH"
+
+    PKG_LIBS="${PKG_LIBS} -framework system"
+
+fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: Package CFLAGS = ${PKG_CFLAGS}" >&5
 $as_echo "$as_me: Package CFLAGS = ${PKG_CFLAGS}" >&6;}

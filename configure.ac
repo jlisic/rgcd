@@ -50,8 +50,7 @@ if test `${CC} ${CFLAGS} ${PKG_CFLAGS} ${CPPFLAGS} ${PKG_CPPFLAGS} -o test_gcd t
   AC_MSG_CHECKING(can I run GCD with Apple System frameworks)
 
   if test `./test_gcd; echo $?` = 0; then
-    AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -D_LIBDISPATCH"])
-    AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -framework system"])
+    : ${FRAMEWORK="GCD_OSX"}
     AC_MSG_RESULT(yes)
   else
     AC_MSG_RESULT(no)
@@ -62,7 +61,7 @@ else
 fi
 
 
-## Grand Central Dispatch on FreeBSD
+## Grand Central Dispatch on FreeBSD/Linux
 AC_MSG_CHECKING(can I compile GCD with libdispatch) 
 
 # can compile?
@@ -91,8 +90,7 @@ if test `${CC} ${CFLAGS} ${PKG_CFLAGS} ${CPPFLAGS} ${PKG_CPPFLAGS} -o test_gcd t
   AC_MSG_CHECKING(can I run GCD with libdispatch)
 
   if test `./test_gcd; echo $?` = 0; then
-    AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -fblocks -D_LIBDISPATCH"])
-    AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -lBlocksRuntime -ldispatch"])
+    : ${FRAMEWORK="LIBDISPATCH"}
     AC_MSG_RESULT(yes)
   else
     AC_MSG_RESULT(no)
@@ -129,8 +127,7 @@ if test `${CC} ${CFLAGS} ${PKG_CFLAGS} ${CPPFLAGS} ${PKG_CPPFLAGS} -o test_omp t
   AC_MSG_CHECKING(can I run with OpenMP)
 
   if test `./test_omp; echo $?` = 0; then
-    AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -fopenmp"])
-    AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -fopenmp"])
+    : ${FRAMEWORK="OPENMP"}
     AC_MSG_RESULT(yes)
   else
     AC_MSG_RESULT(no)
@@ -140,6 +137,25 @@ else
   AC_MSG_RESULT(no)
 fi
 
+## Assign compile flags
+
+# lowest priority OPENMP
+if test `echo ${FRAMEWORK}` = "OPENMP"; then
+    AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -fopenmp"])
+    AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -fopenmp"])
+fi
+
+# second lowest priority GCD FreeBSD / Linux
+if test `echo ${FRAMEWORK}` = "LIBDISPATCH"; then
+    AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -fblocks -D_LIBDISPATCH"])
+    AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -lBlocksRuntime -ldispatch"])
+fi
+
+# highest priority GCD MacOS
+if test `echo ${FRAMEWORK}` = "GCD_OSX"; then
+    AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS} -D_LIBDISPATCH"])
+    AC_SUBST([PKG_LIBS], ["${PKG_LIBS} -framework system"])
+fi
 
 AC_MSG_NOTICE([Package CFLAGS = ${PKG_CFLAGS}])
 AC_MSG_NOTICE([Package LIBS =   ${PKG_LIBS}])
