@@ -8,8 +8,8 @@
 
 
 
-// vector multiply using GCD
-void R_parallel_vector_multiply_gcd( double * x, double * y, int * n ) {
+// inner kernel using GCD
+void R_parallel_inner_kernel_gcd( double * x, double * y, int * n ) {
 
 #ifdef _LIBDISPATCH
   // concurrent queue 
@@ -18,7 +18,7 @@ void R_parallel_vector_multiply_gcd( double * x, double * y, int * n ) {
   // for like loop
   dispatch_apply (*n, my_queue, ^(size_t idx){
      
-      int j;
+      size_t j;
       double tmp = 0;
 
       for( j = 0; j < *n; j++) { 
@@ -31,7 +31,7 @@ void R_parallel_vector_multiply_gcd( double * x, double * y, int * n ) {
 
 #else 
   // serial alternative implementation
-  int idx,j;
+  size_t idx,j;
   double tmp;
 
   for( idx=0; idx < *n; idx++) { 
@@ -47,10 +47,10 @@ void R_parallel_vector_multiply_gcd( double * x, double * y, int * n ) {
 } 
 
 
-// vector multiply using OpenMP
-void R_parallel_vector_multiply_omp( double * x, double * y, int * n ) {
+// inner kernel using OpenMP
+void R_parallel_inner_kernel_omp( double * x, double * y, int * n ) {
 
-  int idx,j;
+  size_t idx,j;
   double tmp;
     
   #pragma omp parallel private(j,tmp) 
@@ -74,10 +74,10 @@ void R_parallel_vector_multiply_omp( double * x, double * y, int * n ) {
 } 
  
 
-// vector multiply 
-void R_vector_multiply( double * x, double * y, int * n ) {
+// inner kernel 
+void R_inner_kernel( double * x, double * y, int * n ) {
 
-  int idx,j;
+  size_t idx,j;
   double tmp;
 
   for( idx=0; idx < *n; idx++) { 

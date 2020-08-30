@@ -20,35 +20,35 @@
 #endif
 
 
-// vector multiply using GCD
-void R_parallel_vector_multiply_gcd( double * x, double * y, int * n );
+// inner kernel using GCD
+void R_parallel_inner_kernel_gcd( double * x, double * y, int * n );
 
-// vector multiply using OPENMP 
-void R_parallel_vector_multiply_omp( double * x, double * y, int * n );
+// inner kernel using OPENMP 
+void R_parallel_inner_kernel_omp( double * x, double * y, int * n );
   
-// vector multiply 
-void R_vector_multiply( double * x, double * y, int * n );
+// inner kernel 
+void R_inner_kernel( double * x, double * y, int * n );
 
 
 
 // C function registration 
 
-static R_NativePrimitiveArgType R_parallel_vector_multiply_gcd_t[] = {
+static R_NativePrimitiveArgType R_parallel_inner_kernel_gcd_t[] = {
   REALSXP, REALSXP, INTSXP
 };
 
-static R_NativePrimitiveArgType R_parallel_vector_multiply_omp_t[] = {
+static R_NativePrimitiveArgType R_parallel_inner_kernel_omp_t[] = {
   REALSXP, REALSXP, INTSXP
 };
 
-static R_NativePrimitiveArgType R_vector_multiply_t[] = {
+static R_NativePrimitiveArgType R_inner_kernel_t[] = {
   REALSXP, REALSXP, INTSXP
 };
 
 static const R_CMethodDef cMethods[] = {
-     {"R_parallel_vector_multiply_gcd", (DL_FUNC) &R_parallel_vector_multiply_gcd, 3, R_parallel_vector_multiply_gcd_t},
-     {"R_parallel_vector_multiply_omp", (DL_FUNC) &R_parallel_vector_multiply_omp, 3, R_parallel_vector_multiply_omp_t},
-     {"R_vector_multiply", (DL_FUNC) &R_vector_multiply, 3, R_vector_multiply_t},
+     {"R_parallel_inner_kernel_gcd", (DL_FUNC) &R_parallel_inner_kernel_gcd, 3, R_parallel_inner_kernel_gcd_t},
+     {"R_parallel_inner_kernel_omp", (DL_FUNC) &R_parallel_inner_kernel_omp, 3, R_parallel_inner_kernel_omp_t},
+     {"R_inner_kernel", (DL_FUNC) &R_inner_kernel, 3, R_inner_kernel_t},
      {NULL, NULL, 0, NULL}
 };
 

@@ -1,7 +1,7 @@
 #'Parallel vector multiplication.
 #'
-#'\code{vector_multiply} multiplies two vectors together using either OpenMP or
-#' Grand Central Dispatch, provided one is available.
+#'\code{inner_kernel} calculates the total squared distance between all points in y against 
+#' each point in x using either OpenMP or Grand Central Dispatch, provided one is available.
 #'
 #' @param x A numeric vector of length n.
 #' @param y A numeric vector of length n.
@@ -15,7 +15,7 @@
 #' @author Jonthan Lisic, \email{jlisic@@gmail.com}
 #' @useDynLib rgcd, .registration = TRUE
 #' @export
-vector_multiply <- function(
+inner_kernel <- function(
   x,
   y,
   gcd=FALSE,
@@ -28,19 +28,19 @@ vector_multiply <- function(
 
   if( gcd ) {
   # send our data to the C program
-  result <- .C("R_parallel_vector_multiply_gcd",
+  result <- .C("R_parallel_inner_kernel_gcd",
     as.double( x ),          
     as.double( y ),
     as.integer( n )    
   )
   } else if(omp) { 
-  result <- .C("R_parallel_vector_multiply_omp",
+  result <- .C("R_parallel_inner_kernel_omp",
     as.double( x ),          
     as.double( y ),
     as.integer( n )    
   )
   } else {
-  result <- .C("R_vector_multiply",
+  result <- .C("R_inner_kernel",
     as.double( x ),          
     as.double( y ),
     as.integer( n )    
